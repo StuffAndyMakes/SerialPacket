@@ -3,6 +3,7 @@ Simple error-detecting packet for sending data or structs over UART on Arduino
 
 ## How to Use
 
+```c++
 #include "Arduino.h"
 #include "SerialPacket.h"
 
@@ -33,3 +34,4 @@ void MyApp:main() {
   }
 
 }
+```
