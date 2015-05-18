@@ -8,6 +8,7 @@
 #ifndef __SerialPacket__SenderApplication__
 #define __SerialPacket__SenderApplication__
 
+#include "Arduino.h"
 #include "SerialPacket.h"
 
 
