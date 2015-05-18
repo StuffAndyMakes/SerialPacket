@@ -21,7 +21,7 @@ typedef struct {
 } Command;
 
 
-class Application: public SerialPacketDelegate {
+class SenderApplication: public SerialPacketDelegate {
     // instance variables
     uint8_t _state;
     Command _currentCommand;
@@ -36,7 +36,7 @@ public:
     static const uint8_t STATUS_NACK = 0;
     static const uint8_t STATUS_ACK = 1;
     
-    Application();
+    SenderApplication();
     void main();
     
     // packet delegate methods
