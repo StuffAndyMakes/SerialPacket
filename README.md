@@ -1,7 +1,9 @@
 # SerialPacket
-Simple error-detecting packet for sending data or structs over UART on Arduino 
+This is a simple error-detecting packet for sending data or structs over UART on Arduino.
 
-## How to Use
+The data payload (your array or structure) is wrapped with FRAME_START and FRAME_END characters. A data length and 8-bit CRC are added in there as well. Used on the receiving end, the SerialPacket class gets the btyes from the HardwareSerial port, checks the length and CRC and calls your app's delegate methods if it's good or if there is an error.
+
+## How to Use (VERY Simplified)
 
 ```c++
 #include "Arduino.h"
@@ -36,3 +38,5 @@ void MyApp:main() {
 
 }
 ```
+
+See SenderApplication and ReceiverApplication examples for more details.
