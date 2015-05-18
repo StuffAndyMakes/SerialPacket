@@ -22,7 +22,7 @@ void MyApp:main() {
   Serial2.begin(115200); // receiving
 
   SerialPacket p;
-  p.setDelegate(yourSerialPacketDelegate); // object to receive calls when things finish or error out
+  p.setDelegate(this); // object to receive calls when things finish or error out
   p.setTimeout(2000); // in ms
   p.sendUsing(&Serial1);
   p.receiveUsing(&Serial2);
