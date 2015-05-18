@@ -13,6 +13,8 @@ http://embedxcode.weebly.com/la_selectdownload-3rojtiygzuzhx8gga.html
 
 embedXcode configures Xcode to work happily with the Arduino toolchains, adds proper syntax highlighting and code indexing for code completion, etc. INFINITELY better than even the latest Arduino IDEs. It does depend on the Arduino IDE being installed, FYI. That's how it gets to a working toolchain for building your apps.
 
+I'm currently working with Xcode after I've run the embedXcode-285-plus.pkg installer for embedXcode. Make sure you have the latest version, either way. Also, I've only been able to get the latest embedXcode+ working with the new Arduino 1.6 IDE, NOT the latest ones (1.6.1, .2, .3, or .4). Rei Vilo maintains excellent docs and READMEs, so use them to troubleshoot.
+
 ## How to Use (VERY Simplified)
 
 This example is not a complete working example, it's here to show you the core pieces to using the class.
