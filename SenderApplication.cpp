@@ -5,7 +5,7 @@
 //  Created by StuffAndyMakes.com (Andy Frey) on 4/13/15.
 //
 
-#include "Application.h"
+#include "SenderApplication.h"
 #include "SerialPacket.h"
 
 
@@ -21,12 +21,12 @@ int freeRam () {
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-Application::Application() {}
+SenderApplication::SenderApplication() {}
 
 /*
  *  Packet Delegate Method: Called when a valid packet is received
  */
-void Application::didReceiveGoodSerialPacket(SerialPacket *p) {
+void SenderApplication::didReceiveGoodSerialPacket(SerialPacket *p) {
     digitalWrite(LED_GOOD, HIGH);
     p->stopReceiving();
     // copy bytes for structure from packet buffer into structre memory
@@ -55,7 +55,7 @@ void Application::didReceiveGoodSerialPacket(SerialPacket *p) {
 /*
  *  Packet Delegate Method: Called when an error is encountered
  */
-void Application::didReceiveBadSerialPacket(SerialPacket *p, uint8_t err) {
+void SenderApplication::didReceiveBadSerialPacket(SerialPacket *p, uint8_t err) {
     digitalWrite(LED_BAD, HIGH);
     p->stopReceiving();
     Serial.print("Error ");
@@ -88,7 +88,7 @@ void Application::didReceiveBadSerialPacket(SerialPacket *p, uint8_t err) {
     delay(3000);
 }
 
-void Application::_newPacket() {
+void SenderApplication::_newPacket() {
     _currentCommand.device = random(1, 254);
     _currentCommand.command = random(0, 255); // Use a reserved byte (FRAME_START) to test escaping
     _currentCommand.value = 100;
@@ -101,7 +101,7 @@ void Application::_newPacket() {
  *  Hard to tell, I know, but this is the main app loop.
  *  Sorry for the lack of self-documenting code. :(
  */
-void Application::main() {
+void SenderApplication::main() {
 
     pinMode(LED_SEND, OUTPUT);
     digitalWrite(LED_SEND, LOW);
