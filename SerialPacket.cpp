@@ -1,12 +1,35 @@
 //
-//  Packet.cpp
-//  ErrorCorrectionExperiment
+//  SenderApplication.cpp
+//  Error-Detecting Serial Packet Communications for Arduino Microcontrollers
+//  Originally designed for use in the Office Chairiot Mark II motorized office chair
 //
-//  Created by Andy Frey on 4/5/15.
+//  Created by Andy Frey on 4/13/15.
 //  Copyright (c) 2015 Andy Frey. All rights reserved.
-//
+/*
+The MIT License (MIT)
 
-#include "Packet.h"
+Copyright (c) 2015 Andy Frey/StuffAndyMakes.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "SerialPacket.h"
 
 
 #define MIN(x,y) (x < y ? x : y)
@@ -23,7 +46,7 @@ void toBin(uint8_t c, char *s) {
 }
 
 
-Packet::Packet() {
+SerialPacket::SerialPacket() {
     // default timeout
     _timeout = 1000;
     _delegate = NULL;
@@ -38,19 +61,19 @@ Packet::Packet() {
     for (uint8_t i = 0; i < MAX_DATA_SIZE; i++) buffer[i] = 0;
 }
 
-void Packet::sendUsing(HardwareSerial *s) {
+void SerialPacket::sendUsing(HardwareSerial *s) {
     _sendingSerial = s;
 }
 
-void Packet::receiveUsing(HardwareSerial *s) {
+void SerialPacket::receiveUsing(HardwareSerial *s) {
     _receivingSerial = s;
 }
 
-void Packet::setDelegate(PacketDelegate *d) {
+void SerialPacket::setDelegate(SerialPacketDelegate *d) {
     _delegate = d;
 }
 
-void Packet::setTimeout(unsigned long t) {
+void SerialPacket::setTimeout(unsigned long t) {
     _timeout = t;
 }
 
@@ -73,18 +96,18 @@ uint8_t Packet::_crc8(const uint8_t *data, uint8_t len) {
     return crc;
 }
 
-uint8_t Packet::getDataLength() {
+uint8_t SerialPacket::getDataLength() {
     return _dataLength;
 }
 
-bool Packet::matchesCRC(Packet *p) {
+bool SerialPacket::matchesCRC(SerialPacket *p) {
     return (_crc == p->_crc);
 }
 
 /*
  *  Blocks until data is sent
  */
-uint8_t Packet::send(uint8_t *p, uint8_t l) {
+uint8_t SerialPacket::send(uint8_t *p, uint8_t l) {
     if (_sendingSerial == NULL) return 0;
     if (l == 0) return 0;
     if (l > MAX_DATA_SIZE) {
@@ -107,7 +130,7 @@ uint8_t Packet::send(uint8_t *p, uint8_t l) {
     return bytesSent;
 }
 
-void Packet::startReceiving() {
+void SerialPacket::startReceiving() {
     if (_receiving == true || _receivingSerial == NULL) return;
     _nextTimeout = millis() + _timeout;
     _dataPos = 0;
@@ -118,16 +141,16 @@ void Packet::startReceiving() {
     _state = STATE_START_WAIT;
 }
 
-void Packet::stopReceiving() {
+void SerialPacket::stopReceiving() {
     _receiving = false;
     _state = STATE_NONE;
 }
 
-void Packet::_callDelegateError(uint8_t err) {
+void SerialPacket::_callDelegateError(uint8_t err) {
     _delegate->didReceiveBadPacket(this, err);
 }
 
-void Packet::loop() {
+void SerialPacket::loop() {
     
     if (_receiving == false) return;
 
@@ -197,7 +220,7 @@ void Packet::loop() {
             _state = STATE_END_WAIT;
         }
 
-    } // while ((_state != STATE_NONE) && (_receivingSerial->available() > 0))
+    } // while (_receivingSerial->available() > 0)
 
     if (millis() > _nextTimeout && _state != STATE_NONE) {
         _callDelegateError(ERROR_TIMEOUT);
