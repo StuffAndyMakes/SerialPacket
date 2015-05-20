@@ -1,15 +1,16 @@
 //
-//  ReceiverApplication.h
-//  SerialPacket Library for Arduino
+//  Application.h
+//  ErrorCorrectionExperiment
 //
-//  Created by StuffAndyMakes.com (Andy Frey) on 4/13/15.
+//  Created by Andy Frey on 4/13/15.
+//  Copyright (c) 2015 Andy Frey. All rights reserved.
 //
 
-#ifndef __SerialPacket__ReceiverApplication__
-#define __SerialPacket__ReceiverApplication__
+#ifndef __ErrorCorrectionExperiment__Application__
+#define __ErrorCorrectionExperiment__Application__
 
 #include "Arduino.h"
-#include "SerialPacket.h"
+#include "Packet.h"
 
 
 typedef struct {
@@ -21,7 +22,7 @@ typedef struct {
 } Command;
 
 
-class ReceiverApplication: public SerialPacketDelegate {
+class Application: public PacketDelegate {
     // instance variables
     uint64_t _expectedSerial;
     
@@ -34,13 +35,13 @@ public:
     static const uint8_t STATUS_NACK = 0;
     static const uint8_t STATUS_ACK = 1;
     
-    ReceiverApplication();
+    Application();
     void main();
     
     // packet delegate members
-    void didReceiveSerialPacket(SerialPacket *p);
-    void didReceiveBadSerialPacket(SerialPacket *p, uint8_t err);
+    void didReceivePacket(Packet *p);
+    void didReceiveBadPacket(Packet *p, uint8_t err);
 
 };
 
-#endif /* defined(__SerialPacket__ReceiverApplication__) */
+#endif /* defined(__ErrorCorrectionExperiment__Application__) */
