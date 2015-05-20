@@ -9,7 +9,7 @@ The data payload (your array or structure) is wrapped with FRAME_START and FRAME
 
 I use Apple's Xcode IDE to write my Arduino and AVR code. To make that work, I use Rei Vilo's embedXcode+ templates, which you can grab the OS X installer package here:
 
-http://embedxcode.weebly.com/la_selectdownload-3rojtiygzuzhx8gga.html
+http://embedxcode.weebly.com/download
 
 If you dig what he's doing, please donate to his cause so we can keep using this amazing IDE for building amazing Arduino and other embedded applications.
 
