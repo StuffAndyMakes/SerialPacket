@@ -40,13 +40,14 @@ void MyApplication:main() {
 
   Serial.begin(115200); // console/output/debugging
   Serial1.begin(115200); // sending
-  Serial2.begin(115200); // receiving
 
   SerialPacket p;
   p.setDelegate(this); // object to receive calls when things finish or error out
   p.setTimeout(2000); // in ms
-  p.sendUsing(&Serial1); // which port to use for sending data
-  p.receiveUsing(&Serial2); // alternately, you can use a different port for sending or receiving
+  p.use(&Serial1); // which port to use for sending/receiving
+  // alternately, you can use a different port for sending or receiving
+  //p.sendUsing($Serial1);
+  //p.receiveUsing(&Serial2);
 
   // you must intentionally initiate receiving
   p.startReceiving(); // on the receiving end or both ends
