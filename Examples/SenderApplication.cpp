@@ -45,12 +45,12 @@ int freeRam () {
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-Application::Application() {}
+SenderApplication::SenderApplication() {}
 
 /*
  *  Packet Delegate Method: Called when a valid packet is received
  */
-void Application::didReceivePacket(Packet *p) {
+void SenderApplication::didReceivePacket(Packet *p) {
     p->stopReceiving();
     digitalWrite(LED_GOOD, HIGH);
     // copy bytes for structure from packet buffer into structre memory
@@ -79,7 +79,7 @@ void Application::didReceivePacket(Packet *p) {
 /*
  *  Packet Delegate Method: Called when an error is encountered
  */
-void Application::didReceiveBadPacket(Packet *p, uint8_t err) {
+void SenderApplication::didReceiveBadPacket(Packet *p, uint8_t err) {
     p->stopReceiving();
     digitalWrite(LED_BAD, HIGH);
     Serial.print("Error ");
@@ -112,7 +112,7 @@ void Application::didReceiveBadPacket(Packet *p, uint8_t err) {
     delay(3000);
 }
 
-void Application::_newPacket() {
+void SenderApplication::_newPacket() {
     _currentCommand.device = random(1, 254);
     _currentCommand.command = random(0, 255); // Use a reserved byte (FRAME_START) to test escaping
     _currentCommand.value = 100;
@@ -125,7 +125,7 @@ void Application::_newPacket() {
  *  Hard to tell, I know, but this is the main app loop.
  *  Sorry for the lack of self-documenting code. :(
  */
-void Application::main() {
+void SenderApplication::main() {
 
     pinMode(LED_SEND, OUTPUT);
     digitalWrite(LED_SEND, LOW);
