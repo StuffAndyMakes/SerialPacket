@@ -90,6 +90,7 @@ public:
     uint8_t buffer[MAX_DATA_SIZE];
     
     SerialPacket();
+    void use(HardwareSerial *s); // sets BOTH send and receive ports
     void sendUsing(HardwareSerial *s);
     void receiveUsing(HardwareSerial *s);
     void setDelegate(PacketDelegate *d);
