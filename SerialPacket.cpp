@@ -61,6 +61,11 @@ SerialPacket::SerialPacket() {
     for (uint8_t i = 0; i < MAX_DATA_SIZE; i++) buffer[i] = 0;
 }
 
+void SerialPacket::void use(HardwareSerial *s) {
+    _sendingSerial = s;
+    _receivingSerial = s;
+}
+
 void SerialPacket::sendUsing(HardwareSerial *s) {
     _sendingSerial = s;
 }
