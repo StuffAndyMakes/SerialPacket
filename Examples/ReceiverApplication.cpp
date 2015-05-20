@@ -1,12 +1,13 @@
 //
-//  ReceiverApplication.cpp
-//  SerialPacket Library for Arduino
+//  Application.cpp
+//  ErrorCorrectionExperiment
 //
-//  Created by StuffAndyMakes.com (Andy Frey) on 4/13/15.
+//  Created by Andy Frey on 4/13/15.
+//  Copyright (c) 2015 Andy Frey. All rights reserved.
 //
 
-#include "ReceiverApplication.h"
-#include "SerialPacket.h"
+#include "Application.h"
+#include "Packet.h"
 
 
 #define LED_SEND 13
@@ -21,12 +22,12 @@ int freeRam () {
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-ReceiverApplication::ReceiverApplication() {}
+Application::Application() {}
 
 /*
- *  SerialPacket Delegate Method: Called when a valid packet is received
+ *  Packet Delegate Method: Called when a valid packet is received
  */
-void ReceiverApplication::didReceiveGoodSerialPacket(Packet *p) {
+void Application::didReceivePacket(Packet *p) {
 
     digitalWrite(LED_GOOD, HIGH);
 
@@ -70,9 +71,9 @@ void ReceiverApplication::didReceiveGoodSerialPacket(Packet *p) {
 /*
  *  Packet Delegate Method: Called when an error is encountered
  */
-void ReceiverApplication::didReceiveBadSerialPacket(Packet *p, uint8_t err) {
+void Application::didReceiveBadPacket(Packet *p, uint8_t err) {
     // timeouts are OK, in this test, since we're waiting for the
-    // other sideto generate an ACK request only on occasion
+    // other side to generate an ACK request only on occasion
     if (err == Packet::ERROR_TIMEOUT) {
         p->startReceiving();
         return;
@@ -113,7 +114,7 @@ void ReceiverApplication::didReceiveBadSerialPacket(Packet *p, uint8_t err) {
  *  Hard to tell, I know, but this is the main app loop.
  *  Sorry for the lack of self-documenting code. :(
  */
-void ReceiverApplication::main() {
+void Application::main() {
 
     pinMode(LED_SEND, OUTPUT);
     digitalWrite(LED_SEND, LOW);
@@ -123,16 +124,15 @@ void ReceiverApplication::main() {
     digitalWrite(LED_BAD, LOW);
     
     Serial.begin(115200);  // debugging
-    Serial1.begin(115200); // send
-    Serial2.begin(115200); // receive
+    Serial1.begin(19200); // packets
 
     _expectedSerial = 0;
 
-    SerialPacket p;
+    Packet p;
     p.setDelegate(this);
     p.setTimeout(1000);
     p.sendUsing(&Serial1);
-    p.receiveUsing(&Serial2);
+    p.receiveUsing(&Serial1);
     p.startReceiving();
 
     Serial.println("GO!");
