@@ -1,13 +1,36 @@
 //
-//  Packet.h
-//  ErrorCorrectionExperiment
+//  SerialPacket.h
+//  Error-Detecting Serial Packet Communications for Arduino Microcontrollers
+//  Originally designed for use in the Office Chairiot Mark II motorized office chair
 //
-//  Created by Andy Frey on 4/5/15.
+//  Created by Andy Frey on 4/13/15.
 //  Copyright (c) 2015 Andy Frey. All rights reserved.
-//
+/*
+The MIT License (MIT)
 
-#ifndef __ErrorCorrectionExperiment__Packet__
-#define __ErrorCorrectionExperiment__Packet__
+Copyright (c) 2015 Andy Frey/StuffAndyMakes.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#ifndef __ErrorDetection__SerialPacket__
+#define __ErrorDetection__SerialPacket__
 
 #include "Arduino.h"
 
@@ -16,25 +39,25 @@
 #define MAX_DATA_SIZE (251)
 
 
-class Packet;
+class SerialPacket;
 
 
-class PacketDelegate {
+class SerialPacketDelegate {
     
 public:
-    virtual void didReceivePacket(Packet *p) = 0;
-    virtual void didReceiveBadPacket(Packet *p, uint8_t err) = 0;
+    virtual void didReceiveGoodPacket(SerialPacket *p) = 0;
+    virtual void didReceiveBadPacket(SerialPacket *p, uint8_t err) = 0;
     
 };
 
 
-class Packet {
+class SerialPacket {
     
     uint8_t _state = STATE_NONE;
     uint8_t _dataLength;
     uint8_t _dataPos;
     uint8_t _crc;
-    PacketDelegate *_delegate;
+    SerialPacketDelegate *_delegate;
     HardwareSerial *_sendingSerial, *_receivingSerial;
     boolean _receiving;
     unsigned long _timeout, _nextTimeout;
@@ -66,7 +89,7 @@ public:
     
     uint8_t buffer[MAX_DATA_SIZE];
     
-    Packet();
+    SerialPacket();
     void sendUsing(HardwareSerial *s);
     void receiveUsing(HardwareSerial *s);
     void setDelegate(PacketDelegate *d);
@@ -80,4 +103,4 @@ public:
     
 };
 
-#endif /* defined(__ErrorCorrectionExperiment__Packet__) */
+#endif /* defined(__ErrorDetection__SerialPacket__) */
