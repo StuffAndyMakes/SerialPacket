@@ -23,18 +23,20 @@ This example is not a complete working example, it's here to show you the core p
 
 ```c++
 #include "Arduino.h"
-#include "MyApp.h"
+#include "MyApplication.h"
 #include "SerialPacket.h"
 
-void MyApp::didReceiveGoodPacket(SerialPacket *p) {
+// called by packet object when a packet arrives intact
+void MyApplication::didReceiveGoodPacket(SerialPacket *p) {
   Serial.println("Got a good packet!");
 }
 
-void MyApp::didReceiveBadPacket(SerialPacket *p, uint8_t err) {
+// called by packet object if there is an error receiving a packet
+void MyApplication::didReceiveBadPacket(SerialPacket *p, uint8_t err) {
   Serial.println("Awe, got a " + String(err, DEC) + " error receiving a packet. :(");
 }
 
-void MyApp:main() {
+void MyApplication:main() {
 
   Serial.begin(115200); // console/output/debugging
   Serial1.begin(115200); // sending
@@ -43,9 +45,10 @@ void MyApp:main() {
   SerialPacket p;
   p.setDelegate(this); // object to receive calls when things finish or error out
   p.setTimeout(2000); // in ms
-  p.sendUsing(&Serial1);
-  p.receiveUsing(&Serial2);
+  p.sendUsing(&Serial1); // which port to use for sending data
+  p.receiveUsing(&Serial2); // alternately, you can use a different port for sending or receiving
 
+  // you must intentionally initiate receiving
   p.startReceiving(); // on the receiving end or both ends
 
   for(;;) {
@@ -56,3 +59,23 @@ void MyApp:main() {
 ```
 
 See SenderApplication and ReceiverApplication examples for more details.
+
+## A Little More Detail
+
+If you're curious, though, my [ProjectName].cpp file (remember, I'm using Xcode with the embedXcode+ Arduino sketch template) instantiates my Application object and then calls its main() method in the loop() function. That (app.main()) is where the code runs from then on out, not in the standard loop() of the Arduino environment.
+
+I use patterns quite a bit that often require there to be an application object they can reference for delegate callbacks. It's also cleaner to read if you step away for a long time. It does add a little overhead in memory, sure, but I'm generally using Mega 2560, so RAM isn't in quite as short supply as an ATmega328 or 168. Here's an example:
+
+```c++
+#include "Arduino.h"
+#include "MyApplication.h"
+
+MyApplication app;
+
+void setup() {}
+
+void loop() {
+    app.main();
+}
+```
+
