@@ -42,7 +42,6 @@ class Packet {
     uint8_t _crc8(const uint8_t *data, uint8_t len);
     void _init();
     void _callDelegateError(uint8_t err);
-    void _addToBuffer(uint8_t b);
     
 public:
     
@@ -54,7 +53,6 @@ public:
     static const uint8_t STATE_ESCAPE = 5;
     static const uint8_t STATE_END_WAIT = 6;
     static const uint8_t STATE_END_FRAME = 7;
-    static const uint8_t STATE_SENDING = 8;
     
     static const uint8_t ERROR_CRC = 1;
     static const uint8_t ERROR_FRAME = 2;
@@ -64,9 +62,9 @@ public:
     
     static const uint8_t FRAME_START = (uint8_t)0b10101010;
     static const uint8_t FRAME_END = (uint8_t)0b01010101;
-    static const uint8_t ESCAPE = (uint8_t)0x5c; // '\'
+    static const uint8_t ESCAPE = (uint8_t)0x5c; // '\' or 92
     
-    uint8_t *buffer;
+    uint8_t buffer[MAX_DATA_SIZE];
     
     Packet();
     void sendUsing(HardwareSerial *s);
