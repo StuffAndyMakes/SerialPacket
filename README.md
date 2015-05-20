@@ -19,7 +19,9 @@ I'm currently working with Xcode after I've run the embedXcode-285-plus.pkg inst
 
 ## How to Use (VERY Simplified)
 
-This example is not a complete working example, it's here to show you the core pieces to using the class.
+This example is not a complete working example, it's here to show you the core pieces to using the class. You will need to get your environment up and working, building and flashing your device, of course. But, once that's all set, you can add the SerialPacket as a library or however you prefer to use it.
+
+Below is a **snippet** of how it can be used in your code:
 
 ```c++
 #include "Arduino.h"
