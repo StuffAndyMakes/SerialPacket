@@ -1,13 +1,36 @@
 //
-//  Application.cpp
-//  ErrorCorrectionExperiment
+//  ReceiverApplication.cpp
+//  Error-Detecting Serial Packet Communications for Arduino Microcontrollers
+//  Originally designed for use in the Office Chairiot Mark II motorized office chair
 //
 //  Created by Andy Frey on 4/13/15.
 //  Copyright (c) 2015 Andy Frey. All rights reserved.
-//
+/*
+The MIT License (MIT)
 
-#include "Application.h"
-#include "Packet.h"
+Copyright (c) 2015 Andy Frey/StuffAndyMakes.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "ReceiverApplication.h"
+#include "SerialPacket.h"
 
 
 #define LED_SEND 13
@@ -22,12 +45,12 @@ int freeRam () {
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-Application::Application() {}
+ReceiverApplication::ReceiverApplication() {}
 
 /*
  *  Packet Delegate Method: Called when a valid packet is received
  */
-void Application::didReceivePacket(Packet *p) {
+void ReceiverApplication::didReceivePacket(Packet *p) {
 
     digitalWrite(LED_GOOD, HIGH);
 
@@ -71,7 +94,7 @@ void Application::didReceivePacket(Packet *p) {
 /*
  *  Packet Delegate Method: Called when an error is encountered
  */
-void Application::didReceiveBadPacket(Packet *p, uint8_t err) {
+void ReceiverApplication::didReceiveBadPacket(Packet *p, uint8_t err) {
     // timeouts are OK, in this test, since we're waiting for the
     // other side to generate an ACK request only on occasion
     if (err == Packet::ERROR_TIMEOUT) {
@@ -114,7 +137,7 @@ void Application::didReceiveBadPacket(Packet *p, uint8_t err) {
  *  Hard to tell, I know, but this is the main app loop.
  *  Sorry for the lack of self-documenting code. :(
  */
-void Application::main() {
+void ReceiverApplication::main() {
 
     pinMode(LED_SEND, OUTPUT);
     digitalWrite(LED_SEND, LOW);
