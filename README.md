@@ -68,15 +68,18 @@ If you're curious, though, my [ProjectName].cpp file (remember, I'm using Xcode 
 I use patterns quite a bit that often require there to be an application object they can reference for delegate callbacks. It's also cleaner to read if you step away for a long time. It does add a little overhead in memory, sure, but I'm generally using Mega 2560, so RAM isn't in quite as short supply as an ATmega328 or 168. Here's an example:
 
 ```c++
-#include "Arduino.h"
+// include the custom app class
 #include "MyApplication.h"
 
+// instantiate custom app object
 MyApplication app;
 
-void setup() {}
+void setup() {
+}
 
 void loop() {
-    app.main();
+  // call the app object's main function to start the app
+  app.main();
 }
 ```
 
