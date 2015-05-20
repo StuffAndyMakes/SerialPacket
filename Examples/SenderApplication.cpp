@@ -1,12 +1,13 @@
 //
-//  SenderApplication.h
-//  SerialPacket Library for Arduino
+//  Application.cpp
+//  ErrorCorrectionExperiment
 //
-//  Created by StuffAndyMakes.com (Andy Frey) on 4/13/15.
+//  Created by Andy Frey on 4/13/15.
+//  Copyright (c) 2015 Andy Frey. All rights reserved.
 //
 
-#include "SenderApplication.h"
-#include "SerialPacket.h"
+#include "Application.h"
+#include "Packet.h"
 
 
 #define LED_SEND 13
@@ -21,14 +22,14 @@ int freeRam () {
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-SenderApplication::SenderApplication() {}
+Application::Application() {}
 
 /*
  *  Packet Delegate Method: Called when a valid packet is received
  */
-void SenderApplication::didReceiveGoodSerialPacket(SerialPacket *p) {
-    digitalWrite(LED_GOOD, HIGH);
+void Application::didReceivePacket(Packet *p) {
     p->stopReceiving();
+    digitalWrite(LED_GOOD, HIGH);
     // copy bytes for structure from packet buffer into structre memory
     Command _receivedCommand;
     memcpy(&_receivedCommand, p->buffer, p->getDataLength());
@@ -40,8 +41,8 @@ void SenderApplication::didReceiveGoodSerialPacket(SerialPacket *p) {
             Serial.println("Ack " + String((uint32_t)_receivedCommand.serial, DEC) + " (OoS! Expecting " + String((uint32_t)_currentCommand.serial, DEC) + ")");
         }
     } else {
-        Serial.print("WAH?? Recv:");
-        Serial.print(" Dev:"); Serial.print(_receivedCommand.device);
+        Serial.println("ACK not request for this packet:");
+        Serial.print("  Dev:"); Serial.print(_receivedCommand.device);
         Serial.print(", Cmd:"); Serial.print(_receivedCommand.command, DEC);
         Serial.print(", Val:"); Serial.print(_receivedCommand.value, DEC);
         Serial.print(", Ser:"); Serial.print((unsigned long)_receivedCommand.serial, DEC);
@@ -55,9 +56,9 @@ void SenderApplication::didReceiveGoodSerialPacket(SerialPacket *p) {
 /*
  *  Packet Delegate Method: Called when an error is encountered
  */
-void SenderApplication::didReceiveBadSerialPacket(SerialPacket *p, uint8_t err) {
-    digitalWrite(LED_BAD, HIGH);
+void Application::didReceiveBadPacket(Packet *p, uint8_t err) {
     p->stopReceiving();
+    digitalWrite(LED_BAD, HIGH);
     Serial.print("Error ");
     Serial.print(err, DEC);
     Serial.print(": ");
@@ -88,7 +89,7 @@ void SenderApplication::didReceiveBadSerialPacket(SerialPacket *p, uint8_t err) 
     delay(3000);
 }
 
-void SenderApplication::_newPacket() {
+void Application::_newPacket() {
     _currentCommand.device = random(1, 254);
     _currentCommand.command = random(0, 255); // Use a reserved byte (FRAME_START) to test escaping
     _currentCommand.value = 100;
@@ -101,7 +102,7 @@ void SenderApplication::_newPacket() {
  *  Hard to tell, I know, but this is the main app loop.
  *  Sorry for the lack of self-documenting code. :(
  */
-void SenderApplication::main() {
+void Application::main() {
 
     pinMode(LED_SEND, OUTPUT);
     digitalWrite(LED_SEND, LOW);
@@ -111,14 +112,13 @@ void SenderApplication::main() {
     digitalWrite(LED_BAD, LOW);
 
     Serial.begin(115200);  // debugging
-    Serial1.begin(115200); // send
-    Serial2.begin(115200); // receive
+    Serial1.begin(19200); // packets
 
-    SerialPacket p;
+    Packet p;
     p.setDelegate(this);
     p.setTimeout(2000);
     p.sendUsing(&Serial1);
-    p.receiveUsing(&Serial2);
+    p.receiveUsing(&Serial1);
 
     _currentCommand.serial = 0;
 
