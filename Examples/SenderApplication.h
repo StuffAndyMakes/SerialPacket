@@ -45,7 +45,7 @@ typedef struct {
 } Command;
 
 
-class SenderApplication: public PacketDelegate {
+class SenderApplication: public SerialPacketDelegate {
     // instance variables
     uint8_t _state;
     Command _currentCommand;
@@ -64,8 +64,8 @@ public:
     void main();
     
     // packet delegate members
-    void didReceivePacket(Packet *p);
-    void didReceiveBadPacket(Packet *p, uint8_t err);
+    void didReceiveGoodPacket(SerialPacket *p);
+    void didReceiveBadPacket(SerialPacket *p, uint8_t err);
     
 };
 
