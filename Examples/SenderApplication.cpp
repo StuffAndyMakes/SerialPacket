@@ -30,7 +30,7 @@ SOFTWARE.
 */
 
 #include "Application.h"
-#include "Packet.h"
+#include "SerialPacket.h"
 
 
 #define LED_SEND 13
@@ -50,7 +50,7 @@ SenderApplication::SenderApplication() {}
 /*
  *  Packet Delegate Method: Called when a valid packet is received
  */
-void SenderApplication::didReceivePacket(Packet *p) {
+void SenderApplication::didReceiveGoodPacket(SerialPacket *p) {
     p->stopReceiving();
     digitalWrite(LED_GOOD, HIGH);
     // copy bytes for structure from packet buffer into structre memory
@@ -79,7 +79,7 @@ void SenderApplication::didReceivePacket(Packet *p) {
 /*
  *  Packet Delegate Method: Called when an error is encountered
  */
-void SenderApplication::didReceiveBadPacket(Packet *p, uint8_t err) {
+void SenderApplication::didReceiveBadPacket(SerialPacket *p, uint8_t err) {
     p->stopReceiving();
     digitalWrite(LED_BAD, HIGH);
     Serial.print("Error ");
@@ -137,7 +137,7 @@ void SenderApplication::main() {
     Serial.begin(115200);  // debugging
     Serial1.begin(19200); // packets
 
-    Packet p;
+    SerialPacket p;
     p.setDelegate(this);
     p.setTimeout(2000);
     p.sendUsing(&Serial1);
