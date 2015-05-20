@@ -151,7 +151,7 @@ void ReceiverApplication::main() {
 
     _expectedSerial = 0;
 
-    Packet p;
+    SerialPacket p;
     p.setDelegate(this);
     p.setTimeout(1000);
     p.sendUsing(&Serial1);
