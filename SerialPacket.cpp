@@ -5,29 +5,31 @@
 //
 //  Created by Andy Frey on 4/13/15.
 //  Copyright (c) 2015 Andy Frey. All rights reserved.
+//
+
 /*
-The MIT License (MIT)
-
-Copyright (c) 2015 Andy Frey/StuffAndyMakes.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+ The MIT License (MIT)
+ 
+ Copyright (c) 2015 Andy Frey/StuffAndyMakes.com
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 
 #include "SerialPacket.h"
 
@@ -61,7 +63,7 @@ SerialPacket::SerialPacket() {
     for (uint8_t i = 0; i < MAX_DATA_SIZE; i++) buffer[i] = 0;
 }
 
-void SerialPacket::void use(HardwareSerial *s) {
+void SerialPacket::use(HardwareSerial *s) {
     _sendingSerial = s;
     _receivingSerial = s;
 }
@@ -85,7 +87,7 @@ void SerialPacket::setTimeout(unsigned long t) {
 // CRC-8 - based on the CRC8 formulas by Dallas/Maxim
 // code released under the therms of the GNU GPL 3.0 license
 // Found at: http://www.leonardomiliani.com/en/2013/un-semplice-crc8-per-arduino/
-uint8_t Packet::_crc8(const uint8_t *data, uint8_t len) {
+uint8_t SerialPacket::_crc8(const uint8_t *data, uint8_t len) {
     uint8_t crc = 0x00;
     while (len--) {
         uint8_t extract = *data++;
@@ -207,7 +209,7 @@ void SerialPacket::loop() {
                 if (c == FRAME_END) {
                     // check CRC and call delegate accordingly
                     if (_crc == _crc8(buffer, _dataLength)) {
-                        _delegate->didReceivePacket(this);
+                        _delegate->didReceiveGoodPacket(this);
                     } else {
                         _callDelegateError(ERROR_CRC);
                     }
@@ -225,7 +227,7 @@ void SerialPacket::loop() {
             _state = STATE_END_WAIT;
         }
 
-    } // while (_receivingSerial->available() > 0)
+    } // while ((_state != STATE_NONE) && (_receivingSerial->available() > 0))
 
     if (millis() > _nextTimeout && _state != STATE_NONE) {
         _callDelegateError(ERROR_TIMEOUT);
