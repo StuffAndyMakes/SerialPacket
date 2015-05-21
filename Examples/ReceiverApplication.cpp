@@ -5,29 +5,32 @@
 //
 //  Created by Andy Frey on 4/13/15.
 //  Copyright (c) 2015 Andy Frey. All rights reserved.
+//
+
 /*
-The MIT License (MIT)
+ The MIT License (MIT)
+ 
+ Copyright (c) 2015 Andy Frey/StuffAndyMakes.com
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 
-Copyright (c) 2015 Andy Frey/StuffAndyMakes.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 
 #include "ReceiverApplication.h"
 #include "SerialPacket.h"
@@ -50,7 +53,7 @@ ReceiverApplication::ReceiverApplication() {}
 /*
  *  Packet Delegate Method: Called when a valid packet is received
  */
-void ReceiverApplication::didReceivePacket(Packet *p) {
+void ReceiverApplication::didReceiveGoodPacket(SerialPacket *p) {
 
     digitalWrite(LED_GOOD, HIGH);
 
@@ -64,40 +67,43 @@ void ReceiverApplication::didReceivePacket(Packet *p) {
     Serial.print(", Val:"); Serial.print(_receivedCommand.value, DEC);
     Serial.print(", Ser:"); Serial.print((unsigned long)_receivedCommand.serial, DEC);
     if (_receivedCommand.serial != _expectedSerial) {
-        Serial.print("!");
+        Serial.print("(OoS)");
         _expectedSerial = _receivedCommand.serial;
     }
-    Serial.print(", Ack:"); Serial.println(_receivedCommand.ack == STATUS_ACK ? "Y" : "N");
+    Serial.print(", Ack:"); Serial.println(_receivedCommand.ack == STATUS_ACK ? "No" : "Req");
+    digitalWrite(LED_GOOD, LOW);
 
     // if ack is STATUS_NACK, sender is expecting us to change it to STATUS_ACK and return packet
     if (_receivedCommand.ack == STATUS_NACK) {
         digitalWrite(LED_SEND, HIGH);
         // sender wants an acknowledgment
-        Serial.print("ACK " + String((uint32_t)_receivedCommand.serial, DEC));
+        Serial.print("ACK " + String((uint32_t)_receivedCommand.serial, DEC) + " ");
         _receivedCommand.ack = STATUS_ACK;
         uint8_t bytesSent = p->send((uint8_t *)&_receivedCommand, sizeof(_receivedCommand));
-        Serial.print(" sent ");
         if (bytesSent > 0) {
-            Serial.println("OK!");
+            digitalWrite(LED_GOOD, HIGH);
+            Serial.println("sent.");
+            digitalWrite(LED_GOOD, LOW);
         } else {
-            Serial.println("FAIL.");
+            digitalWrite(LED_BAD, HIGH);
+            Serial.println("NOT sent.");
+            digitalWrite(LED_BAD, LOW);
         }
         digitalWrite(LED_SEND, LOW);
     }
 
     _expectedSerial++;
 
-    digitalWrite(LED_GOOD, LOW);
     p->startReceiving();
 }
 
 /*
  *  Packet Delegate Method: Called when an error is encountered
  */
-void ReceiverApplication::didReceiveBadPacket(Packet *p, uint8_t err) {
+void ReceiverApplication::didReceiveBadPacket(SerialPacket *p, uint8_t err) {
     // timeouts are OK, in this test, since we're waiting for the
     // other side to generate an ACK request only on occasion
-    if (err == Packet::ERROR_TIMEOUT) {
+    if (err == SerialPacket::ERROR_TIMEOUT) {
         p->startReceiving();
         return;
     }
@@ -107,19 +113,19 @@ void ReceiverApplication::didReceiveBadPacket(Packet *p, uint8_t err) {
     Serial.print(err, DEC);
     Serial.print(": ");
     switch (err) {
-        case Packet::ERROR_CRC:
+        case SerialPacket::ERROR_CRC:
             Serial.print("CRC Mismatch");
             break;
-        case Packet::ERROR_FRAME:
+        case SerialPacket::ERROR_FRAME:
             Serial.print("Framing (missing end)");
             break;
-        case Packet::ERROR_LENGTH:
+        case SerialPacket::ERROR_LENGTH:
             Serial.print("Data Length");
             break;
-        case Packet::ERROR_OVERFLOW:
+        case SerialPacket::ERROR_OVERFLOW:
             Serial.print("Buffer Overflow");
             break;
-        case Packet::ERROR_TIMEOUT:
+        case SerialPacket::ERROR_TIMEOUT:
             Serial.print("Timeout");
             break;
             
@@ -129,6 +135,7 @@ void ReceiverApplication::didReceiveBadPacket(Packet *p, uint8_t err) {
     }
     Serial.println(" ");
     _expectedSerial++;
+    delay(250); // keep red on a bit
     digitalWrite(LED_BAD, LOW);
     p->startReceiving();
 }
@@ -154,8 +161,7 @@ void ReceiverApplication::main() {
     SerialPacket p;
     p.setDelegate(this);
     p.setTimeout(1000);
-    p.sendUsing(&Serial1);
-    p.receiveUsing(&Serial1);
+    p.use(&Serial1);
     p.startReceiving();
 
     Serial.println("GO!");
