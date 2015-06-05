@@ -3,6 +3,8 @@ This is a simple error-detecting packet C++ class for sending data or structs ov
 
 NOTE: As of May 2015, this is BRAND NEW and VERY UNTESTED. Still in the tinkering stage. Be careful and don't bark at me if it doesn't work even a little.
 
+ALSO NOTE: There is a better thing that this. Similar in function to this class but which incorporates COBS byte stuffing to make easier distinction between packets coming down the wire. Look at my repo list for a "COBSSerialPacket" project.
+
 The data payload (your array or structure) is wrapped with FRAME_START and FRAME_END characters. A data length and 8-bit CRC are added in there as well. Used on the receiving end, the SerialPacket class gets the btyes from the HardwareSerial port, checks the length and CRC and calls your app's delegate methods if it's good or if there is an error.
 
 ## My Development Environment (YMMV, otherwise)
