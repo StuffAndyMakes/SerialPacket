@@ -1,3 +1,7 @@
+# EXPERIMENTAL and REPLACED
+
+This code is an experiment that is now replaced with a better byte-stuffing solution using Consistent Overhead Byte Stuffing (https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing). New version coming shortly to public view.
+
 # SerialPacket
 This is a simple error-detecting packet C++ class for sending data or structs over UART on Arduino.
 
